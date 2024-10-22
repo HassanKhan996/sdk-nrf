@@ -537,7 +537,7 @@ static int firmware_instance_schedule(uint16_t obj_inst_id)
 	return 0;
 }
 
-static int firmware_update_cb(uint16_t obj_inst_id, uint8_t *args, uint16_t args_len)
+int firmware_update_cb(uint16_t obj_inst_id, uint8_t *args, uint16_t args_len)
 {
 	int postpone_update;
 	ARG_UNUSED(args);
@@ -815,10 +815,15 @@ static void fota_download_callback(const struct fota_download_evt *evt)
 		set_result(ongoing_obj_id, RESULT_CONNECTION_LOST);
 		break;
 	case FOTA_DOWNLOAD_EVT_ERROR:
-		LOG_ERR("FOTA_DOWNLOAD_EVT_ERROR");
 
+		LOG_ERR("FOTA_DOWNLOAD_EVT_ERROR");
+    
 		dfu_image_type = fota_download_target();
 		LOG_INF("FOTA download failed, target %d", dfu_image_type);
+
+		LOG_ERR("System reboot triggering ..............");
+		sys_reboot(0);
+		
 		target_image_type_store(ongoing_obj_id, dfu_image_type);
 		switch (evt->cause) {
 		/* No error, used when event ID is not FOTA_DOWNLOAD_EVT_ERROR. */
@@ -840,6 +845,7 @@ static void fota_download_callback(const struct fota_download_evt *evt)
 			set_result(ongoing_obj_id, RESULT_UPDATE_FAILED);
 			break;
 		}
+		
 		break;
 
 	case FOTA_DOWNLOAD_EVT_FINISHED:

@@ -142,6 +142,7 @@ Serial LTE modem
 nRF5340 Audio
 -------------
 
+
 |no_changes_yet_note|
 
 nRF Machine Learning (Edge Impulse)
@@ -292,7 +293,7 @@ This section provides detailed lists of changes by :ref:`driver <drivers>`.
 Wi-Fi drivers
 -------------
 
-* Added a new feature to recover nRF70 chip.
+|no_changes_yet_note|
 
 Libraries
 =========
@@ -332,7 +333,7 @@ Modem libraries
 Libraries for networking
 ------------------------
 
-* Added the :ref:`lib_wifi_ready` library.
+|no_changes_yet_note|
 
 Libraries for NFC
 -----------------

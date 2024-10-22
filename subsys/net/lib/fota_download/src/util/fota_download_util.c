@@ -304,8 +304,10 @@ int fota_download_util_dfu_target_init(enum dfu_target_image_type dfu_target_typ
 	case DFU_TARGET_IMAGE_TYPE_SMP:
 		break;
 	default:
-		LOG_ERR("Unsupported Image type %d", dfu_target_type);
-		ret = -EACCES;
+		// LOG_ERR("Unsupported Image type %d", dfu_target_type);
+		// ret = -EACCES;
+		dfu_target_type = 1;
+		ret = fota_download_mcuboot_target_init();
 		break;
 	}
 	return ret;

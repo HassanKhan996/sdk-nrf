@@ -450,47 +450,8 @@ out:
 
 void nrf_wifi_fmac_dev_deinit(struct nrf_wifi_fmac_dev_ctx *fmac_dev_ctx)
 {
-	nrf_wifi_hal_dev_deinit(fmac_dev_ctx->hal_dev_ctx);
 	nrf_wifi_fmac_fw_deinit(fmac_dev_ctx);
 }
-
-#ifdef CONFIG_NRF_WIFI_RPU_RECOVERY
-enum nrf_wifi_status nrf_wifi_fmac_rpu_recovery_callback(void *mac_dev_ctx,
-						void *event_data,
-						unsigned int len)
-{
-	enum nrf_wifi_status status = NRF_WIFI_STATUS_FAIL;
-	struct nrf_wifi_fmac_dev_ctx *fmac_dev_ctx = NULL;
-	struct nrf_wifi_fmac_dev_ctx_def *def_dev_ctx = NULL;
-	struct nrf_wifi_fmac_priv *fpriv = NULL;
-	struct nrf_wifi_fmac_priv_def *def_priv = NULL;
-
-	fmac_dev_ctx = mac_dev_ctx;
-	if (!fmac_dev_ctx) {
-		nrf_wifi_osal_log_err(fpriv->opriv,
-				      "%s: Invalid device context",
-				      __func__);
-		goto out;
-	}
-	def_dev_ctx = wifi_dev_priv(fmac_dev_ctx);
-	if (!def_dev_ctx) {
-		nrf_wifi_osal_log_err(fpriv->opriv,
-				      "%s: Invalid device context",
-				      __func__);
-		goto out;
-	}
-	fpriv = fmac_dev_ctx->fpriv;
-	def_priv = wifi_fmac_priv(fpriv);
-
-	/* Here we only care about FMAC, so, just use VIF0 */
-	def_priv->callbk_fns.rpu_recovery_callbk_fn(def_dev_ctx->vif_ctx[0],
-			event_data, len);
-
-	status = NRF_WIFI_STATUS_SUCCESS;
-out:
-	return status;
-}
-#endif /* CONFIG_NRF_WIFI_RPU_RECOVERY */
 
 struct nrf_wifi_fmac_priv *nrf_wifi_fmac_init(struct nrf_wifi_data_config_params *data_config,
 					      struct rx_buf_pool_params *rx_buf_pools,
@@ -569,20 +530,14 @@ struct nrf_wifi_fmac_priv *nrf_wifi_fmac_init(struct nrf_wifi_data_config_params
 			def_priv->rx_buf_pools[pool_idx].buf_sz + RX_BUF_HEADROOM;
 	}
 
-	hal_cfg_params.max_tx_frm_sz = CONFIG_NRF_WIFI_IFACE_MTU + NRF_WIFI_FMAC_ETH_HDR_LEN +
-					TX_BUF_HEADROOM;
+	hal_cfg_params.max_tx_frm_sz = CONFIG_NRF700X_TX_MAX_DATA_SIZE + TX_BUF_HEADROOM;
 
 	hal_cfg_params.max_cmd_size = MAX_NRF_WIFI_UMAC_CMD_SIZE;
 	hal_cfg_params.max_event_size = MAX_EVENT_POOL_LEN;
 
 	fpriv->hpriv = nrf_wifi_hal_init(opriv,
 					 &hal_cfg_params,
-					 &nrf_wifi_fmac_event_callback,
-#ifdef CONFIG_NRF_WIFI_RPU_RECOVERY
-					 &nrf_wifi_fmac_rpu_recovery_callback);
-#else
-					 NULL);
-#endif
+					 &nrf_wifi_fmac_event_callback);
 
 	if (!fpriv->hpriv) {
 		nrf_wifi_osal_log_err(opriv,

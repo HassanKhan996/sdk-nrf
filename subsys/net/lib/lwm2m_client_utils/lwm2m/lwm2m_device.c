@@ -41,8 +41,12 @@ int lwm2m_device_reboot_cb(uint16_t obj_inst_id, uint8_t *args,
 	ARG_UNUSED(args_len);
 
 	LOG_INF("DEVICE: Reboot in progress");
+	// demo 
+	sys_reboot(0);
+	
+	//
 
-	return k_work_schedule(&reboot_work, REBOOT_DELAY);
+	// return k_work_schedule(&reboot_work, REBOOT_DELAY);
 }
 
 int lwm2m_init_device(void)

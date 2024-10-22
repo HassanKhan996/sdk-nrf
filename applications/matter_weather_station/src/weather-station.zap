@@ -287,7 +287,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "NameSupportBitmap",
+              "type": "bitmap8",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -4766,7 +4766,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -5787,7 +5787,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "NameSupportBitmap",
+              "type": "bitmap8",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -6889,7 +6889,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "NameSupportBitmap",
+              "type": "bitmap8",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -8091,7 +8091,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "NameSupportBitmap",
+              "type": "bitmap8",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -9071,7 +9071,7 @@
       "profileId": 259,
       "endpointId": 1,
       "networkId": 0,
-      "endpointVersion": 2,
+      "endpointVersion": 1,
       "deviceIdentifier": 770
     },
     {
@@ -9080,7 +9080,7 @@
       "profileId": 259,
       "endpointId": 2,
       "networkId": 0,
-      "endpointVersion": 2,
+      "endpointVersion": 1,
       "deviceIdentifier": 775
     },
     {
@@ -9089,7 +9089,7 @@
       "profileId": 259,
       "endpointId": 3,
       "networkId": 0,
-      "endpointVersion": 2,
+      "endpointVersion": 1,
       "deviceIdentifier": 773
     }
   ],

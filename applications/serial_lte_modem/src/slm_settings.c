@@ -60,10 +60,8 @@ static int settings_set(const char *name, size_t len, settings_read_cb read_cb, 
 			return 0;
 #endif
 	}
-	/* Simply ignore obsolete settings that are not in use anymore.
-	 * settings_delete() does not completely remove settings.
-	 */
-	return 0;
+
+	return -ENOENT;
 }
 
 static struct settings_handler slm_settings_conf = {

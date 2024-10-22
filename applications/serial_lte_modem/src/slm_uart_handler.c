@@ -188,7 +188,7 @@ static void rx_process(struct k_work *work)
 	rx_recovery();
 }
 
-static int tx_start(bool indicate)
+static int tx_start(void)
 {
 	uint8_t *buf;
 	size_t ret;
@@ -197,10 +197,8 @@ static int tx_start(bool indicate)
 
 	(void)pm_device_state_get(uart_dev, &state);
 	if (state != PM_DEVICE_STATE_ACTIVE) {
-		if (indicate) {
-			(void)indicate_start();
-		}
-		return 1;
+		(void)indicate_start();
+		return -ENODEV;
 	}
 
 	ret = ring_buf_get_claim(&tx_buf, &buf, ring_buf_capacity_get(&tx_buf));
@@ -230,7 +228,7 @@ static void uart_callback(const struct device *dev, struct uart_event *evt, void
 			LOG_ERR("UART_TX_DONE failure: %d", err);
 		}
 		if (ring_buf_is_empty(&tx_buf) == false) {
-			(void)tx_start(false);
+			(void)tx_start();
 		} else {
 			k_sem_give(&tx_done_sem);
 		}
@@ -241,7 +239,7 @@ static void uart_callback(const struct device *dev, struct uart_event *evt, void
 			LOG_ERR("UART_TX_ABORTED failure: %d", err);
 		}
 		if (ring_buf_is_empty(&tx_buf) == false) {
-			(void)tx_start(false);
+			(void)tx_start();
 		} else {
 			k_sem_give(&tx_done_sem);
 		}
@@ -312,7 +310,7 @@ int slm_uart_power_on(void)
 	}
 
 	k_sem_give(&tx_done_sem);
-	(void)tx_start(false);
+	(void)tx_start();
 
 	return 0;
 }
@@ -328,7 +326,7 @@ int slm_uart_power_off(void)
 	}
 
 	/* Write sync str to buffer, so it is send first when we power UART.*/
-	(void)slm_uart_tx_write(SLM_SYNC_STR, sizeof(SLM_SYNC_STR)-1, true, false);
+	(void)slm_uart_tx_write(SLM_SYNC_STR, sizeof(SLM_SYNC_STR)-1, true);
 
 	return err;
 }
@@ -343,7 +341,7 @@ bool slm_uart_can_context_send(const uint8_t *data, size_t len)
 }
 
 /* Write the data to tx_buffer and trigger sending. */
-int slm_uart_tx_write(const uint8_t *data, size_t len, bool print_full_debug, bool indicate)
+int slm_uart_tx_write(const uint8_t *data, size_t len, bool print_full_debug)
 {
 	size_t ret;
 	size_t sent = 0;
@@ -360,7 +358,7 @@ int slm_uart_tx_write(const uint8_t *data, size_t len, bool print_full_debug, bo
 		} else {
 			/* Buffer full, block and start TX. */
 			k_sem_take(&tx_done_sem, K_FOREVER);
-			err = tx_start(indicate);
+			err = tx_start();
 			if (err) {
 				LOG_ERR("TX buf overflow, %d dropped. Unable to send: %d",
 					len - sent,
@@ -374,8 +372,8 @@ int slm_uart_tx_write(const uint8_t *data, size_t len, bool print_full_debug, bo
 	k_mutex_unlock(&mutex_tx_put);
 
 	if (k_sem_take(&tx_done_sem, K_NO_WAIT) == 0) {
-		err = tx_start(indicate);
-		if (err == 1) {
+		err = tx_start();
+		if (err == -ENODEV) {
 			k_sem_give(&tx_done_sem);
 			return 0;
 		} else if (err) {
@@ -443,7 +441,7 @@ int slm_uart_handler_init(slm_uart_rx_callback_t callback_t)
 
 	k_sem_give(&tx_done_sem);
 
-	err = slm_uart_tx_write(SLM_SYNC_STR, sizeof(SLM_SYNC_STR)-1, true, false);
+	err = slm_uart_tx_write(SLM_SYNC_STR, sizeof(SLM_SYNC_STR)-1, true);
 	if (err) {
 		return err;
 	}

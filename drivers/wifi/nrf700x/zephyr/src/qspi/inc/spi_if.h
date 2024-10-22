@@ -13,8 +13,6 @@
 
 int spim_init(struct qspi_config *config);
 
-int spim_deinit(void);
-
 int spim_write(unsigned int addr, const void *data, int len);
 
 int spim_read(unsigned int addr, void *data, int len);

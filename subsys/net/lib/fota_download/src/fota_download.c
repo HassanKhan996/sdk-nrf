@@ -517,7 +517,7 @@ int fota_download_start_with_image_type(const char *host, const char *file,
 		return err;
 	}
 
-	return 0;
+	return 0;         
 }
 
 static int fota_download_object_init(void)

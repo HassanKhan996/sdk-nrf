@@ -16,15 +16,10 @@ config WPA_SUPP
 	select NET_L2_WIFI_MGMT
 	select WIFI_NM
 	select EXPERIMENTAL if !SOC_SERIES_NRF53X && !SOC_SERIES_NRF91X
-	select COMMON_LIBC_MALLOC
 	help
 	  WPA supplicant implements 802.1X related functions.
 
 if WPA_SUPP
-
-config COMMON_LIBC_MALLOC_ARENA_SIZE
-	# 30K is mandatory, but might need more for long duration use cases
-	default 30000
 
 # Memory optimizations
 config WPA_SUPP_ADVANCED_FEATURES
@@ -188,10 +183,15 @@ config BSS_MAX_IDLE_TIME
 # Control interface is stack heavy (buffers + snprintfs)
 # Making calls to RPU from net_mgmt callbacks (status - RSSI)
 config NET_MGMT_EVENT_STACK_SIZE
-	default 5120
+	default 4096
 
 config NET_SOCKETS_POLL_MAX
 	default 6
+
+# Supplicant API is stack heavy (buffers + snprintfs) and control interface
+# uses socketpair which pushes the stack usage causing overflow for 2048 bytes.
+config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 2560
 
 module = WPA_SUPP
 module-str = WPA supplicant

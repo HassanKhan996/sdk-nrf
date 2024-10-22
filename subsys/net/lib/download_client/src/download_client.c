@@ -302,7 +302,15 @@ static int client_connect(struct download_client *dl)
 			dl->proto = IPPROTO_TCP;
 		}
 	}
-
+	
+	if (dl->proto == IPPROTO_UDP){
+		LOG_WRN("UDP download connection");
+	}
+	else if (dl->proto == IPPROTO_DTLS_1_2){
+		LOG_WRN("DTLS 1.2 download connection");
+	}else {
+		LOG_WRN("%d connection", dl->proto);
+	}
 	if (dl->proto == IPPROTO_UDP || dl->proto == IPPROTO_DTLS_1_2) {
 		if (!IS_ENABLED(CONFIG_COAP)) {
 			err = -EPROTONOSUPPORT;
@@ -410,7 +418,7 @@ static int client_connect(struct download_client *dl)
 	}
 
 	LOG_INF("Connecting to %s", dl->host);
-	LOG_DBG("fd %d, addrlen %d, fam %s, port %d",
+	LOG_WRN("fd %d, addrlen %d, fam %s, port %d",
 		dl->fd, addrlen, str_family(dl->remote_addr.sa_family), port);
 
 	err = connect(dl->fd, &dl->remote_addr, addrlen);

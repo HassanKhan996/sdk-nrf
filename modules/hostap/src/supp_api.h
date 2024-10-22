@@ -12,7 +12,6 @@
 
 #define MAX_SSID_LEN 32
 #define MAC_ADDR_LEN 6
-#define CHAN_NUM_LEN 6 /* for space-separated channel numbers string */
 
 /**
  * @brief Request a connection

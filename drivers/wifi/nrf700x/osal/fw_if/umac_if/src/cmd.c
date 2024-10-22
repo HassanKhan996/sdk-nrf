@@ -148,31 +148,10 @@ enum nrf_wifi_status umac_cmd_init(struct nrf_wifi_fmac_dev_ctx *fmac_dev_ctx,
 #ifdef CONFIG_NRF700X_TCP_IP_CHECKSUM_OFFLOAD
 	umac_cmd_data->tcp_ip_checksum_offload = 1;
 #endif /* CONFIG_NRF700X_TCP_IP_CHECKSUM_OFFLOAD */
-	umac_cmd_data->discon_timeout = CONFIG_NRF_WIFI_AP_DEAD_DETECT_TIMEOUT;
-#ifdef CONFIG_NRF_WIFI_RPU_RECOVERY
-	umac_cmd_data->watchdog_timer_val =
-		(CONFIG_NRF_WIFI_RPU_RECOVERY_PS_ACTIVE_TIMEOUT_MS) / 1000;
-#else
-	/* Disable watchdog */
-	umac_cmd_data->watchdog_timer_val = 0xFFFFFF;
-#endif /* CONFIG_NRF_WIFI_RPU_RECOVERY */
 
 	nrf_wifi_osal_log_dbg(fmac_dev_ctx->fpriv->opriv, "RPU LPM type: %s\n",
 		umac_cmd_data->sys_params.sleep_enable == 2 ? "HW" :
 		umac_cmd_data->sys_params.sleep_enable == 1 ? "SW" : "DISABLED");
-#ifdef CONFIG_NRF_WIFI_MGMT_BUFF_OFFLOAD
-	umac_cmd_data->mgmt_buff_offload =  1;
-	nrf_wifi_osal_log_info(fmac_dev_ctx->fpriv->opriv,
-			       "Management buffer offload enabled\n");
-#endif /* CONFIG_NRF_WIFI_MGMT_BUFF_OFFLOAD */
-#ifdef CONFIG_NRF_WIFI_FEAT_KEEPALIVE
-	umac_cmd_data->keep_alive_enable = KEEP_ALIVE_ENABLED;
-	umac_cmd_data->keep_alive_period = CONFIG_NRF_WIFI_KEEPALIVE_PERIOD_S;
-	nrf_wifi_osal_log_dbg(fmac_dev_ctx->fpriv->opriv,
-			       "Keepalive enabled with period %d\n",
-				   umac_cmd_data->keepalive_period);
-#endif /* CONFIG_NRF_WIFI_FEAT_KEEPALIVE */
-
 #ifndef CONFIG_NRF700X_RADIO_TEST
 	nrf_wifi_osal_mem_cpy(fmac_dev_ctx->fpriv->opriv,
 			      umac_cmd_data->rx_buf_pools,
@@ -213,13 +192,7 @@ enum nrf_wifi_status umac_cmd_init(struct nrf_wifi_fmac_dev_ctx *fmac_dev_ctx,
 		umac_cmd_data->disable_beamforming = 1;
 	}
 
-#if defined(CONFIG_NRF_WIFI_QOS_NULL_BASED_RETRIEVAL)
-	umac_cmd_data->ps_data_retrieval_mech = QOS_NULL_FRAME;
-#else
-	umac_cmd_data->ps_data_retrieval_mech = PS_POLL_FRAME;
-#endif  /* CONFIG_NRF_WIFI_QOS_NULL_BASED_RETRIEVAL */
-
-	status = nrf_wifi_hal_ctrl_cmd_send(fmac_dev_ctx->hal_dev_ctx,
+	 status = nrf_wifi_hal_ctrl_cmd_send(fmac_dev_ctx->hal_dev_ctx,
 					    umac_cmd,
 					    (sizeof(*umac_cmd) + len));
 
